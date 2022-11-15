@@ -4,7 +4,7 @@ export default function SignUpPage() {
 
   return (
     <PageContainer>
-      <Logo>MyWallet</Logo>
+      <Logo title='Página inicial'>MyWallet</Logo>
       <Form>
         <Input
           type='email'
@@ -22,14 +22,14 @@ export default function SignUpPage() {
         >
         </Input>
 
-        <Button type='submit'>
+        <Button type='submit' title='Fazer login'>
           Entrar
         </Button>
       </Form>
 
-        <ButtonSwap>
-          Primeira vez? Cadastre-se!
-        </ButtonSwap>
+      <ButtonSwap title='Fazer cadastro'>
+        Primeira vez? Cadastre-se!
+      </ButtonSwap>
     </PageContainer>
   );
 }
@@ -60,9 +60,13 @@ const PageContainer = styled.main`
       background-position: 0% 50%;
     }
   }
+
+  &:hover {
+    cursor: default;
+  }
 `;
 
-const Logo = styled.span`
+const Logo = styled.button`
   font-family: 'Saira Stencil One', sans-serif;
   font-weight: 400;
   font-size: 32px;
@@ -70,6 +74,9 @@ const Logo = styled.span`
   margin: 24px 0px;
   color: #FFFFFF;
   transition: 1s;
+  border: none;
+  outline: none;
+  background-color: transparent;
 
   &:hover {
     transform: scale(1.2);
@@ -128,7 +135,7 @@ const Button = styled.button`
 
   &:hover {
     background-color: rgba(255, 255, 255, .30);
-    transform: scale(1.03);
+    transform: scale(1.05);
   }
 `;
 
