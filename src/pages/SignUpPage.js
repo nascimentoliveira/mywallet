@@ -1,35 +1,47 @@
 import styled from 'styled-components';
 
-export default function SignUpPage() {
+export default function SignInPage() {
 
   return (
     <PageContainer>
       <Logo>MyWallet</Logo>
       <Form>
         <Input
+          type='text'
+          placeholder='Nome'
+          name='name'
+          required
+        />
+
+        <Input
           type='email'
           placeholder='E-mail'
           name='email'
           required
-        >
-        </Input>
+        />
 
         <Input
           type='password'
           placeholder='Senha'
           name='password'
           required
-        >
-        </Input>
+        />
+
+        <Input
+          type='password'
+          placeholder='Confirme a senha'
+          name='password'
+          required
+        />
 
         <Button type='submit'>
-          Entrar
+          Cadastrar
         </Button>
       </Form>
 
-        <ButtonSwap>
-          Primeira vez? Cadastre-se!
-        </ButtonSwap>
+      <ButtonSwap>
+        Já tem uma conta? Entre agora!
+      </ButtonSwap>
     </PageContainer>
   );
 }
@@ -73,7 +85,7 @@ const Logo = styled.span`
 
   &:hover {
     transform: scale(1.2);
-}
+  }
 `;
 
 const Form = styled.form`
@@ -148,5 +160,5 @@ const ButtonSwap = styled.button`
   &:hover {
     color: rgba(255, 255, 255, 1);
     transform: scale(1.1);
-  }
+}
 `;
