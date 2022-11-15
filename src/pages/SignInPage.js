@@ -80,6 +80,7 @@ const Logo = styled.button`
 
   &:hover {
     transform: scale(1.2);
+    cursor: pointer;
 }
 `;
 
@@ -136,6 +137,7 @@ const Button = styled.button`
   &:hover {
     background-color: rgba(255, 255, 255, .30);
     transform: scale(1.05);
+    cursor: pointer;
   }
 `;
 
@@ -155,5 +157,6 @@ const ButtonSwap = styled.button`
   &:hover {
     color: rgba(255, 255, 255, 1);
     transform: scale(1.1);
+    cursor: pointer;
   }
 `;

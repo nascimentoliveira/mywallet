@@ -1,47 +1,32 @@
 import styled from 'styled-components';
 
-export default function SignInPage() {
+export default function AddEntryPage() {
 
   return (
     <PageContainer>
       <Logo title='Página inicial'>MyWallet</Logo>
+      <div>Nova entrada</div>
       <Form>
         <Input
+          type='number'
+          min="0.00"
+          step="0.01"
+          placeholder='Valor'
+          name='money'
+          required
+        />
+
+        <Input
           type='text'
-          placeholder='Nome'
-          name='name'
+          placeholder='Descrição'
+          name='description'
           required
         />
 
-        <Input
-          type='email'
-          placeholder='E-mail'
-          name='email'
-          required
-        />
-
-        <Input
-          type='password'
-          placeholder='Senha'
-          name='password'
-          required
-        />
-
-        <Input
-          type='password'
-          placeholder='Confirme a senha'
-          name='password'
-          required
-        />
-
-        <Button type='submit' title='Criar conta'>
-          Cadastrar
+        <Button type='submit' title='Salvar'>
+          Salvar entrada
         </Button>
       </Form>
-
-      <ButtonSwap title='Fazer login'>
-        Já tem uma conta? Entre agora!
-      </ButtonSwap>
     </PageContainer>
   );
 }
@@ -53,13 +38,23 @@ const PageContainer = styled.main`
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 	background: linear-gradient(-45deg, #8C11BE, #6F00FF, #8C11BE, #6F00FF);
 	background-size: 400% 400%;
-  padding: 5%;
+  padding: 25px 5%;
   box-sizing: border-box;
 	animation: gradient 10s ease infinite;
   transition: 2s;
+
+  div {
+    width: 100%;
+    max-width: 330px;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 31px;
+    margin-bottom: 40px;
+    color: #FFFFFF
+  }
 
   @keyframes gradient {
     0% {
@@ -151,24 +146,4 @@ const Button = styled.button`
     transform: scale(1.05);
     cursor: pointer;
   }
-`;
-
-const ButtonSwap = styled.button`
-  font-family: 'Raleway';
-  font-weight: 700;
-  font-size: 15px;
-  line-height: 18px;
-  margin: 36px 0px;
-  box-sizing: border-box;
-  background-color: transparent;
-  color: rgba(255, 255, 255, .80);
-  border: none;
-  outline: none;
-  transition: 1s;
-
-  &:hover {
-    color: rgba(255, 255, 255, 1);
-    transform: scale(1.1);
-    cursor: pointer;
-}
 `;

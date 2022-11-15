@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
 import WalletPage from './pages/WalletPage';
+import AddEntryPage from './pages/AddEntryPage';
 
 export default function App() {
   return (
@@ -12,8 +13,7 @@ export default function App() {
         <Route path='/' element={<SignInPage />} />
         <Route path='/signup' element={<SignUpPage />} />
         <Route path='/wallet' element={<WalletPage />} />
-       {/*  <Route path='/inflow' element={<InflowPage />} />
-        <Route path='/outflow' element={<OutflowPage />} /> */}
+        <Route path='/addentry' element={<AddEntryPage />} />
       </Routes>
     </BrowserRouter>
   );
