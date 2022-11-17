@@ -1,15 +1,76 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Rings } from 'react-loader-spinner';
+
 import styled from 'styled-components';
 
-export default function SignInPage() {
+export default function SignUpPage() {
+
+  const navigate = useNavigate();
+  const [formEnabled, setFormEnabled] = useState(true);
+  const [user, setUser] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  function handleForm(e) {
+    const { name, value } = e.target;
+    setUser({ ...user, [name]: value });
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function spinner() {
+    return (
+      <Rings
+        height='50'
+        width='50'
+        color='#7202F7'
+        radius='4'
+      />
+    );
+  }
+
+  async function signUp(e) {
+    setFormEnabled(false);
+    e.preventDefault();
+    await sleep(5 * 1000)
+    /* axios.post(SIGN_UP_URL, user)
+      .then(() => {
+        navigate('/');
+      })
+      .catch(err => {
+        toast.error(`Erro: ${err.response.data.message}`, {
+          position: toast.POSITION.TOP_CENTER,
+          theme: 'colored',
+        });
+        setFormEnabled(true);
+      }); */
+    setFormEnabled(true);
+  }
 
   return (
     <PageContainer>
-      <Logo title='Página inicial'>MyWallet</Logo>
-      <Form>
+      <Link to='/'>
+        <Logo
+          title={formEnabled ? 'Página inicial' : 'aguarde...'}
+          disabled={!formEnabled}
+        >
+          MyWallet
+        </Logo>
+      </Link>
+      <Form onSubmit={signUp}>
         <Input
           type='text'
           placeholder='Nome'
           name='name'
+          value={user.name}
+          onChange={handleForm}
+          disabled={!formEnabled}
           required
         />
 
@@ -17,6 +78,9 @@ export default function SignInPage() {
           type='email'
           placeholder='E-mail'
           name='email'
+          value={user.email}
+          onChange={handleForm}
+          disabled={!formEnabled}
           required
         />
 
@@ -24,24 +88,38 @@ export default function SignInPage() {
           type='password'
           placeholder='Senha'
           name='password'
+          value={user.password}
+          onChange={handleForm}
+          disabled={!formEnabled}
           required
         />
 
         <Input
           type='password'
           placeholder='Confirme a senha'
-          name='password'
+          name='confirmPassword'
+          value={user.confirmPassword}
+          onChange={handleForm}
+          disabled={!formEnabled}
           required
         />
 
-        <Button type='submit' title='Criar conta'>
-          Cadastrar
+        <Button
+          type='submit'
+          title={formEnabled ? 'Criar conta' : 'aguarde...'}
+          disabled={!formEnabled}
+        >
+          {formEnabled ? 'Cadastrar' : spinner()}
         </Button>
       </Form>
-
-      <ButtonSwap title='Fazer login'>
-        Já tem uma conta? Entre agora!
-      </ButtonSwap>
+      <Link to='/'>
+        <ButtonSwap
+          title={formEnabled ? 'Fazer login' : 'aguarde...'}
+          disabled={!formEnabled}
+        >
+          Já tem uma conta? Entre agora!
+        </ButtonSwap>
+      </Link>
     </PageContainer>
   );
 }
@@ -83,7 +161,6 @@ const Logo = styled.button`
   font-weight: 400;
   font-size: 32px;
   line-height: 50px;
-  margin: 24px 0px;
   color: #FFFFFF;
   transition: 1s;
   border: none;
@@ -94,6 +171,11 @@ const Logo = styled.button`
     transform: scale(1.2);
     cursor: pointer;
   }
+
+  &:disabled {
+    transform: none;
+    cursor: default;
+  }
 `;
 
 const Form = styled.form`
@@ -102,6 +184,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 30px 0px;
 `;
 
 const Input = styled.input`
@@ -129,6 +212,14 @@ const Input = styled.input`
   &:focus {
     outline: none;
   }
+
+  &:disabled {
+    color: #AFAFAF;
+    background-color: #F2F2F2;
+    -webkit-text-fill-color: #AFAFAF;
+    -webkit-box-shadow: 0 0 0px 45px #F2F2F2 inset;
+    box-shadow: 0 0 0px 45px #F2F2F2 inset;
+  }
 `;
 
 const Button = styled.button`
@@ -141,6 +232,9 @@ const Button = styled.button`
   color: #FFFFFF;
   background-color: rgba(255, 255, 255, .15);
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin: 3px;
   border: none;
   outline: none;
@@ -151,6 +245,12 @@ const Button = styled.button`
     transform: scale(1.05);
     cursor: pointer;
   }
+
+  &:disabled {
+    transform: none;
+    background-color: rgba(255, 255, 255, .15);
+    cursor: default;
+  }
 `;
 
 const ButtonSwap = styled.button`
@@ -158,7 +258,6 @@ const ButtonSwap = styled.button`
   font-weight: 700;
   font-size: 15px;
   line-height: 18px;
-  margin: 36px 0px;
   box-sizing: border-box;
   background-color: transparent;
   color: rgba(255, 255, 255, .80);
@@ -170,5 +269,11 @@ const ButtonSwap = styled.button`
     color: rgba(255, 255, 255, 1);
     transform: scale(1.1);
     cursor: pointer;
-}
+  }
+
+  &:disabled {
+    transform: none;
+    color: rgba(255, 255, 255, .80);
+    cursor: default;
+  }
 `;

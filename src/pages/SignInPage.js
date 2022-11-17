@@ -26,6 +26,7 @@ export default function SignUpPage() {
     const { name, value } = e.target
     SetForm({ ...form, [name]: value })
   }
+
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -64,7 +65,14 @@ export default function SignUpPage() {
   return (
     <PageContainer>
       <ToastContainer />
-      <Logo title='Página inicial'>MyWallet</Logo>
+      <Link to='/'>
+        <Logo
+          title={formEnabled ? 'Página inicial' : 'aguarde...'}
+          disabled={!formEnabled}
+        >
+          MyWallet
+        </Logo>
+      </Link>
       <Form onSubmit={signIn}>
         <Input
           type='email'
@@ -143,7 +151,6 @@ const Logo = styled.button`
   font-weight: 400;
   font-size: 32px;
   line-height: 50px;
-  margin: 24px 0px;
   color: #FFFFFF;
   transition: 1s;
   border: none;
@@ -153,7 +160,12 @@ const Logo = styled.button`
   &:hover {
     transform: scale(1.2);
     cursor: pointer;
-}
+  }
+
+  &:disabled {
+    transform: none;
+    cursor: default;
+  }
 `;
 
 const Form = styled.form`
@@ -162,6 +174,7 @@ const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 30px 0px;
 `;
 
 const Input = styled.input`
@@ -235,7 +248,6 @@ const ButtonSwap = styled.button`
   font-weight: 700;
   font-size: 15px;
   line-height: 18px;
-  margin: 36px 0px;
   box-sizing: border-box;
   background-color: transparent;
   color: rgba(255, 255, 255, .80);
