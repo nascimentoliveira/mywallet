@@ -1,26 +1,114 @@
+import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { IoLogOutOutline, IoAddCircleOutline, IoRemoveCircleOutline } from 'react-icons/io5';
+import { useNavigate, Link } from 'react-router-dom';
+import { Rings } from 'react-loader-spinner';
+import UserContext from '../UserContext';
+import WalletContext from '../WalletContext';
+import Records from './Records';
 
 export default function WalletPage() {
+
+  const { user, setUser } = useContext(UserContext);
+  const { setEdit, setEntryType } = useContext(WalletContext);
+  const [entriesList, setEntriesList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const navigate = useNavigate();
+
+  const data = [
+    {
+      id: 4,
+      type: 'out',
+      date: '30/11',
+      description: 'Almoço',
+      value: '39.90'
+    },
+    {
+      id: 3,
+      type: 'out',
+      date: '27/11',
+      description: 'Mercado',
+      value: '542,54'
+    },
+    {
+      id: 2,
+      type: 'out',
+      date: '26/11',
+      description: 'Compras',
+      value: '67.60'
+    },
+    {
+      id: 1,
+      type: 'in',
+      date: '30/11',
+      description: 'Empréstimo',
+      value: '500.00'
+    },
+    {
+      id: 0,
+      type: 'in',
+      date: '15/11',
+      description: 'Salário',
+      value: '3000.00'
+    }
+  ];
+
+  useEffect(() => {
+    setLoading(true)
+    /* axios.get(ENTRY_LIST_URL, config)
+      .then(res => {
+        setEntriesList(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setLoading(false);
+        setError(true);
+        toast.error(`Erro: ${err.response.data.message}`, {
+          position: toast.POSITION.TOP_CENTER,
+          theme: 'colored',
+        });
+      }); */
+  }, []);
 
   return (
     <PageContainer>
       <Top>
-        <Logo title='Página inicial'>MyWallet</Logo>
+        <Link to='/'>
+          <Logo title='Página inicial'>MyWallet</Logo>
+        </Link>
         <div>
           <Name>Olá, Fulano</Name>
           <button title='Logout'><IoLogOutOutline /></button>
         </div>
       </Top>
-      <Book>Não há registros de entrada ou saída</Book>
+      <Records 
+        entriesList={data}  
+        error={false}
+        loading={false}
+      />
       <Footer>
-        <Button title='Nova entrada'>
+        <Button
+          title='Nova entrada'
+          onClick={() => {
+            setEntryType('in');
+            setEdit(false);
+            navigate('/entry');
+          }}
+        >
           <div>
             <IoAddCircleOutline />
             <span>Nova entrada</span>
           </div>
         </Button>
-        <Button title='Nova saída'>
+        <Button
+          title='Nova saída'
+          onClick={() => {
+            setEntryType('out');
+            setEdit(false);
+            navigate('/entry');
+          }}
+        >
           <div>
             <IoRemoveCircleOutline />
             <span>Nova saída</span>
@@ -33,6 +121,7 @@ export default function WalletPage() {
 
 const PageContainer = styled.main`
   width: 100%;
+  min-width: 280px;
   height: 100vh;
   min-height: 100vh;
   display: flex;
@@ -41,7 +130,7 @@ const PageContainer = styled.main`
   justify-content: center;
 	background: linear-gradient(-45deg, #8C11BE, #6F00FF, #8C11BE, #6F00FF);
 	background-size: 400% 400%;
-  padding: 25px 5%;
+  padding: 25px;
   box-sizing: border-box;
 	animation: gradient 10s ease infinite;
   transition: 2s;
@@ -120,25 +209,6 @@ const Name = styled.span`
   color: #FFFFFF;
 `;
 
-const Book = styled.section`
-  height: 100%;
-  width: 100%;
-  max-width: 330px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Raleway', sans-serif;
-  font-weight: 400;
-  font-size: 20px;
-  line-height: 23px;
-  text-align: center;
-  color: #868686;
-  margin: 13px 0px;
-  box-sizing: border-box;
-  background-color: rgba(255, 255, 255, .90);
-  border-radius: 5px;
-`;
-
 const Footer = styled.footer`
   height: 114px;
   width: 100%;
@@ -149,6 +219,7 @@ const Footer = styled.footer`
 
 const Button = styled.button`
   width: 48%;
+  box-sizing: border-box;
   font-family: 'Raleway', sans-serif;
   font-weight: 700;
   font-size: 17px;

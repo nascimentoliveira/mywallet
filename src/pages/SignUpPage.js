@@ -134,7 +134,7 @@ const PageContainer = styled.main`
   justify-content: center;
 	background: linear-gradient(-45deg, #8C11BE, #6F00FF, #8C11BE, #6F00FF);
 	background-size: 400% 400%;
-  padding: 5%;
+  padding: 25px;
   box-sizing: border-box;
 	animation: gradient 10s ease infinite;
   transition: 2s;

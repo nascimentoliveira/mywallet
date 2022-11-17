@@ -1,6 +1,10 @@
 import styled from 'styled-components';
+import WalletContext from '../WalletContext';
+import { useState, useContext, useEffect } from 'react';
 
 export default function AddEntryPage() {
+
+  const { setEdit, setEntryType } = useContext(WalletContext);
 
   return (
     <PageContainer>
