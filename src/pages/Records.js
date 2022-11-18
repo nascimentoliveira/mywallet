@@ -7,19 +7,32 @@ import WalletContext from '../WalletContext'
 
 export default function Records({ entriesList, error, loading }) {
 
-  const { setEdit, setEntryType } = useContext(WalletContext);
+  const { setEdit, setEntryType, setEntry } = useContext(WalletContext);
   const navigate = useNavigate();
+  const noEntries = false;
+
+  function calculateBalance(entries) {
+    let balance = 0;
+    entries.forEach(entry => {
+      if (entry.type === 'in')
+        balance += Number(entry.value);
+      else
+        balance -= Number(entry.value);
+    });
+    return balance.toFixed(2);
+  }
+
+  const balance = calculateBalance(entriesList)
 
   function handleDelete(e, id) {
-    e.preventDefault();
-    alert("clicou no ", id);
-
+    alert('tem certeza')
   }
 
   if (entriesList.length === 0) {
     if (loading) {
+      noEntries = true;
       return (
-        <RecordsComponent noList={true}>
+        <RecordsComponent noEntries={noEntries}>
           Um momento...
           <Rings
             height='100'
@@ -31,7 +44,7 @@ export default function Records({ entriesList, error, loading }) {
       );
     } else if (error) {
       return (
-        <RecordsComponent noList={true}>
+        <RecordsComponent noEntries={noEntries}>
           Um erro ocorreu!
           Não foi possível carregar os dados da sua carteira!
           Verifique a sua conexão e tente novamente!
@@ -39,7 +52,7 @@ export default function Records({ entriesList, error, loading }) {
       );
     } else {
       return (
-        <RecordsComponent noList={true}>
+        <RecordsComponent noEntries={noEntries}>
           Não há registros de entrada ou saída!
         </RecordsComponent>
       );
@@ -47,41 +60,44 @@ export default function Records({ entriesList, error, loading }) {
   }
 
   return (
-    <RecordsComponent noList={false}>
+    <RecordsComponent noEntries={noEntries}>
       <div>
         {entriesList.map(entry =>
-          <Entry
-            key={entry.id}
-            onClick={() => {
-              setEntryType(entry.type);
-              setEdit(true);
-              navigate('/entry');
-            }}
-          >
-            <Date>{entry.date}</Date>
-            <div>
-              <Description>{entry.description}</Description>
-              <Value type={entry.type}>{entry.value}</Value>
-            </div>
-            <button
-              title='excluir'
+          <EntryComponent key={entry.id}>
+            <Entry
+              title={`Editar ${entry.type === 'in' ? 'entrada' : 'saída'}`}
+              onClick={() => {
+                setEntryType(entry.type);
+                setEdit(true);
+                setEntry(entry);
+                navigate('/entry');
+              }}
+            >
+              <Date>{entry.date}</Date>
+              <div>
+                <Description>{entry.description}</Description>
+                <Value type={entry.type}>{entry.value.toString().replace('.', ',')}</Value>
+              </div>
+            </Entry>
+            <DeleteButton
+              title={`Excluir ${entry.type === 'in' ? 'entrada' : 'saída'}`}
               onClick={(e) => handleDelete(e, entry.id)}
             >
               <IoClose />
-            </button>
-          </Entry>
+            </DeleteButton>
+          </EntryComponent>
+
         )}
       </div>
       <div>
-        <Saldo>
+        <Balance>
           <span>SALDO</span>
-          <Total positive={true}>{2849.96}</Total>
-        </Saldo>
+          <Total positive={(balance > 0) ? true : false}>{balance.toString().replace('.', ',')}</Total>
+        </Balance>
       </div>
     </RecordsComponent>
   );
 }
-
 
 const RecordsComponent = styled.section`
   height: 100%;
@@ -89,7 +105,7 @@ const RecordsComponent = styled.section`
   max-width: 330px;
   display: flex;
   flex-direction: column;
-  justify-content: ${props => props.noList ? 'center' : 'space-between'};
+  justify-content: ${props => props.noEntries ? 'center' : 'space-between'};
   align-items: center;
   font-family: 'Raleway', sans-serif;
   font-weight: 400;
@@ -100,13 +116,21 @@ const RecordsComponent = styled.section`
   margin: 13px 0px;
   padding: 23px 12px 10px 12px;
   box-sizing: border-box;
-  background-color: rgba(255, 255, 255, .90);
+  background-color: rgba(255, 255, 255, .85);
   border-radius: 5px;
 
   div {
     width: 100%;
     height: 25px;
+    display: ${props => props.noEntries ? 'flex' : 'block'};
+    justify-content: center;
   }
+`;
+
+const EntryComponent = styled.section`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const Entry = styled.button`
@@ -120,7 +144,9 @@ const Entry = styled.button`
   font-size: 16px;
   line-height: 19px;
   background-color: transparent;
-  margin: 8px 0px;
+  margin: 8px 5px 8px 0px;
+  padding: 0px;
+  box-sizing: border-box;
   border: none;
   outline: none;
   cursor: pointer;
@@ -128,14 +154,15 @@ const Entry = styled.button`
   div {
     width: 100%;
     display: flex;
-    padding: 0px 7px;
+    padding: 0px 3px 0px 7px;
+    box-sizing: border-box;
     justify-content: space-between;
     align-items: center;
   }
+`;
 
-  button {
-    width: 18px;
-    height: 18px;
+const DeleteButton = styled.button`
+    height: 100%;
     border: none;
     outline: none;
     background-color: transparent;
@@ -147,16 +174,17 @@ const Entry = styled.button`
     cursor: pointer;
 
     svg {
-      color: #C6C6C6;
+      width: 15px;
+      height: 15px;
+      color: #969696;
     }
-  }
 `;
 
 const Date = styled.span`
   font-weight: 400;
   font-size: 16px;
   line-height: 19px;
-  color: #C6C6C6;
+  color: #969696;
 `;
 
 const Description = styled.span`
@@ -174,7 +202,7 @@ const Value = styled.span`
   color: ${props => props.type == 'in' ? '#03AC00' : '#C70000'};
 `;
 
-const Saldo = styled.section`
+const Balance = styled.section`
   display: flex;
   justify-content: space-between;
   align-items: center;

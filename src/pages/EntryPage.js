@@ -1,22 +1,64 @@
 import styled from 'styled-components';
 import WalletContext from '../WalletContext';
 import { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Rings } from 'react-loader-spinner';
 
-export default function AddEntryPage() {
+export default function EntryPage() {
 
-  const { setEdit, setEntryType } = useContext(WalletContext);
+  const { edit, entryType, entry, setEntry } = useContext(WalletContext);
+  const [formEnabled, setFormEnabled] = useState(true);
+  const navigate = useNavigate();
+
+  function handleForm(e) {
+    const { name, value } = e.target;
+    setEntry({ ...entry, [name]: value });
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function spinner() {
+    return (
+      <Rings
+        height='50'
+        width='50'
+        color='#7202F7'
+        radius='4'
+      />
+    );
+  }
+
+  async function handleClick(e) {
+    setFormEnabled(false);
+    e.preventDefault();
+    await sleep(10 * 1000);
+    setFormEnabled(true);
+    navigate('/wallet');
+  }
 
   return (
     <PageContainer>
-      <Logo title='Página inicial'>MyWallet</Logo>
-      <div>Nova entrada</div>
-      <Form>
+      <Link to='/'>
+        <Logo
+          title={formEnabled ? 'Página inicial' : 'aguarde...'}
+          disabled={!formEnabled}
+        >
+          MyWallet
+        </Logo>
+      </Link>
+      <Top>{edit ? 'Editar ' : 'Nova '}{entryType == 'in' ? 'entrada ' : 'saída '}</Top>
+      <Form onSubmit={handleClick}>
         <Input
           type='number'
           min="0.00"
           step="0.01"
           placeholder='Valor'
-          name='money'
+          name='value'
+          value={entry.value}
+          onChange={handleForm}
+          disabled={!formEnabled}
           required
         />
 
@@ -24,11 +66,18 @@ export default function AddEntryPage() {
           type='text'
           placeholder='Descrição'
           name='description'
+          value={entry.description}
+          onChange={handleForm}
+          disabled={!formEnabled}
           required
         />
 
-        <Button type='submit' title='Salvar'>
-          Salvar entrada
+        <Button
+          type='submit'
+          title={`${formEnabled ? (edit ? 'Atualizar ' : 'Salvar ') + (entryType == 'in' ? 'entrada ' : 'saída ') : 'aguarde...'}`}
+          disabled={!formEnabled}
+        >
+          {formEnabled ? (edit ? 'Atualizar ' : 'Salvar ') + (entryType == 'in' ? 'entrada ' : 'saída ') : spinner()}
         </Button>
       </Form>
     </PageContainer>
@@ -48,17 +97,6 @@ const PageContainer = styled.main`
   box-sizing: border-box;
 	animation: gradient 10s ease infinite;
   transition: 2s;
-
-  div {
-    width: 100%;
-    max-width: 330px;
-    font-family: 'Raleway', sans-serif;
-    font-weight: 700;
-    font-size: 26px;
-    line-height: 31px;
-    margin-bottom: 40px;
-    color: #FFFFFF
-  }
 
   @keyframes gradient {
     0% {
@@ -93,6 +131,22 @@ const Logo = styled.button`
     transform: scale(1.2);
     cursor: pointer;
   }
+
+  &:disabled {
+    transform: none;
+    cursor: default;
+  }
+`;
+
+const Top = styled.div`
+  width: 100%;
+  max-width: 330px;
+  font-family: 'Raleway', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 31px;
+  margin-bottom: 40px;
+  color: #FFFFFF;
 `;
 
 const Form = styled.form`
@@ -122,11 +176,19 @@ const Input = styled.input`
     font-family: 'Raleway', sans-serif;
     font-size: 20px;
     line-height: 23px;
-    color: #000000;
+    color: #909090;
   }
 
   &:focus {
     outline: none;
+  }
+
+  &:disabled {
+    color: #AFAFAF;
+    background-color: #F2F2F2;
+    -webkit-text-fill-color: #AFAFAF;
+    -webkit-box-shadow: 0 0 0px 45px #F2F2F2 inset;
+    box-shadow: 0 0 0px 45px #F2F2F2 inset;
   }
 `;
 
@@ -140,6 +202,9 @@ const Button = styled.button`
   color: #FFFFFF;
   background-color: rgba(255, 255, 255, .15);
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin: 3px;
   border: none;
   outline: none;
@@ -149,5 +214,11 @@ const Button = styled.button`
     background-color: rgba(255, 255, 255, .30);
     transform: scale(1.05);
     cursor: pointer;
+  }
+
+  &:disabled {
+    transform: none;
+    background-color: rgba(255, 255, 255, .15);
+    cursor: default;
   }
 `;

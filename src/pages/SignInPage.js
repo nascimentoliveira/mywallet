@@ -65,14 +65,11 @@ export default function SignUpPage() {
   return (
     <PageContainer>
       <ToastContainer />
-      <Link to='/'>
-        <Logo
-          title={formEnabled ? 'Página inicial' : 'aguarde...'}
-          disabled={!formEnabled}
-        >
-          MyWallet
-        </Logo>
-      </Link>
+      <Logo
+        title={formEnabled ? 'Página inicial' : 'aguarde...'}
+      >
+        MyWallet
+      </Logo>
       <Form onSubmit={signIn}>
         <Input
           type='email'
@@ -149,22 +146,17 @@ const PageContainer = styled.main`
 const Logo = styled.button`
   font-family: 'Saira Stencil One', sans-serif;
   font-weight: 400;
-  font-size: 32px;
+  font-size: 40px;
   line-height: 50px;
   color: #FFFFFF;
   transition: 1s;
   border: none;
   outline: none;
   background-color: transparent;
+  cursor: default;
 
   &:hover {
     transform: scale(1.2);
-    cursor: pointer;
-  }
-
-  &:disabled {
-    transform: none;
-    cursor: default;
   }
 `;
 
@@ -196,7 +188,7 @@ const Input = styled.input`
     font-family: 'Raleway', sans-serif;
     font-size: 20px;
     line-height: 23px;
-    color: #000000;
+    color: #909090;
   }
 
   &:focus {

@@ -2,7 +2,6 @@ import { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { IoLogOutOutline, IoAddCircleOutline, IoRemoveCircleOutline } from 'react-icons/io5';
 import { useNavigate, Link } from 'react-router-dom';
-import { Rings } from 'react-loader-spinner';
 import UserContext from '../UserContext';
 import WalletContext from '../WalletContext';
 import Records from './Records';
@@ -10,7 +9,7 @@ import Records from './Records';
 export default function WalletPage() {
 
   const { user, setUser } = useContext(UserContext);
-  const { setEdit, setEntryType } = useContext(WalletContext);
+  const { setEdit, setEntryType, setEntry } = useContext(WalletContext);
   const [entriesList, setEntriesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -29,7 +28,7 @@ export default function WalletPage() {
       type: 'out',
       date: '27/11',
       description: 'Mercado',
-      value: '542,54'
+      value: '542.50'
     },
     {
       id: 2,
@@ -43,7 +42,7 @@ export default function WalletPage() {
       type: 'in',
       date: '30/11',
       description: 'Empréstimo',
-      value: '500.00'
+      value: '500.02'
     },
     {
       id: 0,
@@ -78,7 +77,7 @@ export default function WalletPage() {
           <Logo title='Página inicial'>MyWallet</Logo>
         </Link>
         <div>
-          <Name>Olá, Fulano</Name>
+          <Name>{`Olá, ${user.name}`}</Name>
           <button title='Logout'><IoLogOutOutline /></button>
         </div>
       </Top>
@@ -106,6 +105,7 @@ export default function WalletPage() {
           onClick={() => {
             setEntryType('out');
             setEdit(false);
+            setEntry({value: '', description: ''})
             navigate('/entry');
           }}
         >
@@ -197,14 +197,14 @@ const Logo = styled.button`
 
   &:hover {
     transform: scale(1.05);
-}
+  }
 `;
 
 const Name = styled.span`
   font-family: 'Raleway';
   font-weight: 700;
-  font-size: 26px;
-  line-height: 31px;
+  font-size: 20px;
+  line-height: 25px;
   margin: 0px 5px;
   color: #FFFFFF;
 `;

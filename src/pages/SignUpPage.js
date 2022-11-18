@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Rings } from 'react-loader-spinner';
-
 import styled from 'styled-components';
 
 export default function SignUpPage() {
@@ -159,7 +158,7 @@ const PageContainer = styled.main`
 const Logo = styled.button`
   font-family: 'Saira Stencil One', sans-serif;
   font-weight: 400;
-  font-size: 32px;
+  font-size: 40px;
   line-height: 50px;
   color: #FFFFFF;
   transition: 1s;
@@ -206,7 +205,7 @@ const Input = styled.input`
     font-family: 'Raleway', sans-serif;
     font-size: 20px;
     line-height: 23px;
-    color: #000000;
+    color: #909090;
   }
 
   &:focus {
