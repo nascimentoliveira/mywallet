@@ -1,22 +1,32 @@
-import styled from 'styled-components';
-import WalletContext from '../WalletContext';
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
+import styled from 'styled-components';
+import axios from 'axios';
+
+import WalletContext from '../WalletContext.js';
+import UserContext from '../UserContext.js';
+import { ENTRY_URL } from '../constants.js';
 
 export default function EntryPage() {
 
+  const navigate = useNavigate();
+  const { user } = useContext(UserContext);
   const { edit, entryType, entry, setEntry } = useContext(WalletContext);
   const [formEnabled, setFormEnabled] = useState(true);
-  const navigate = useNavigate();
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`
+    }
+  };
 
   function handleForm(e) {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === 'description')
+      entry.value = Number.parseFloat(entry.value).toFixed(2);
     setEntry({ ...entry, [name]: value });
-  }
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function spinner() {
@@ -30,12 +40,45 @@ export default function EntryPage() {
     );
   }
 
-  async function handleClick(e) {
-    setFormEnabled(false);
+  function handleSend(e) {
     e.preventDefault();
-    await sleep(10 * 1000);
-    setFormEnabled(true);
-    navigate('/wallet');
+    setFormEnabled(false);
+    /* setEntry({ ...entry, value: Number(entry.value).toFixed(2).toString() }); */
+    if (edit) {
+      axios.put(
+        `${ENTRY_URL}/${entry.id}`, {
+        value: entry.value,
+        description: entry.description,
+        type: entry.type
+      }, config)
+        .then(res => {
+          navigate('/wallet');
+        })
+        .catch(err => {
+          toast.error(`Erro: ${err.response.data.message}`, {
+            position: toast.POSITION.TOP_CENTER,
+            theme: 'colored',
+          });
+          setFormEnabled(true);
+        });
+    } else {
+      axios.post(
+        ENTRY_URL, {
+        value: entry.value,
+        description: entry.description,
+        type: entryType
+      }, config)
+        .then(res => {
+          navigate('/wallet');
+        })
+        .catch(err => {
+          toast.error(`Erro: ${err.response.data.message}`, {
+            position: toast.POSITION.TOP_CENTER,
+            theme: 'colored',
+          });
+          setFormEnabled(true);
+        });
+    }
   }
 
   return (
@@ -48,8 +91,8 @@ export default function EntryPage() {
           MyWallet
         </Logo>
       </Link>
-      <Top>{edit ? 'Editar ' : 'Nova '}{entryType == 'in' ? 'entrada ' : 'saída '}</Top>
-      <Form onSubmit={handleClick}>
+      <Top>{edit ? 'Editar ' : 'Nova '}{entryType === 'in' ? 'entrada ' : 'saída '}</Top>
+      <Form onSubmit={handleSend}>
         <Input
           type='number'
           min="0.00"
@@ -74,10 +117,10 @@ export default function EntryPage() {
 
         <Button
           type='submit'
-          title={`${formEnabled ? (edit ? 'Atualizar ' : 'Salvar ') + (entryType == 'in' ? 'entrada ' : 'saída ') : 'aguarde...'}`}
+          title={`${formEnabled ? (edit ? 'Atualizar ' : 'Salvar ') + (entryType === 'in' ? 'entrada ' : 'saída ') : 'aguarde...'}`}
           disabled={!formEnabled}
         >
-          {formEnabled ? (edit ? 'Atualizar ' : 'Salvar ') + (entryType == 'in' ? 'entrada ' : 'saída ') : spinner()}
+          {formEnabled ? (edit ? 'Atualizar ' : 'Salvar ') + (entryType === 'in' ? 'entrada ' : 'saída ') : spinner()}
         </Button>
       </Form>
     </PageContainer>

@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
 import styled from 'styled-components';
+import axios from 'axios';
+
+import { SIGN_UP_URL } from '../constants.js';
 
 export default function SignUpPage() {
 
   const navigate = useNavigate();
   const [formEnabled, setFormEnabled] = useState(true);
-  const [user, setUser] = useState({
+  const [form, SetForm] = useState({
     name: '',
     email: '',
     password: '',
@@ -16,11 +20,7 @@ export default function SignUpPage() {
 
   function handleForm(e) {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value });
-  }
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    SetForm({ ...form, [name]: value });
   }
 
   function spinner() {
@@ -34,22 +34,41 @@ export default function SignUpPage() {
     );
   }
 
-  async function signUp(e) {
-    setFormEnabled(false);
+  function confirmPassword() {
+    if (form.password !== form.confirmPassword) {
+      toast.error(`Confirmação de senha não confere!`, {
+        position: toast.POSITION.TOP_CENTER,
+        theme: 'colored',
+      });
+      SetForm({ ...form, ['confirmPassword']: '' });
+      setFormEnabled(true);
+    } else {
+      return ({
+        name: form.name, 
+        email: form.email, 
+        password: form.password
+      });
+    }
+  }
+
+  function signUp(e) {
     e.preventDefault();
-    await sleep(5 * 1000)
-    /* axios.post(SIGN_UP_URL, user)
-      .then(() => {
-        navigate('/');
-      })
-      .catch(err => {
-        toast.error(`Erro: ${err.response.data.message}`, {
-          position: toast.POSITION.TOP_CENTER,
-          theme: 'colored',
+    setFormEnabled(false);
+    const user = confirmPassword();
+
+    if (user) {
+      axios.post(SIGN_UP_URL, user)
+        .then(() => {
+          navigate('/');
+        })
+        .catch(err => {
+          toast.error(`Erro: ${err.response.data.message}`, {
+            position: toast.POSITION.TOP_CENTER,
+            theme: 'colored',
+          });
+          setFormEnabled(true);
         });
-        setFormEnabled(true);
-      }); */
-    setFormEnabled(true);
+    }
   }
 
   return (
@@ -67,7 +86,7 @@ export default function SignUpPage() {
           type='text'
           placeholder='Nome'
           name='name'
-          value={user.name}
+          value={form.name}
           onChange={handleForm}
           disabled={!formEnabled}
           required
@@ -77,7 +96,7 @@ export default function SignUpPage() {
           type='email'
           placeholder='E-mail'
           name='email'
-          value={user.email}
+          value={form.email}
           onChange={handleForm}
           disabled={!formEnabled}
           required
@@ -87,7 +106,7 @@ export default function SignUpPage() {
           type='password'
           placeholder='Senha'
           name='password'
-          value={user.password}
+          value={form.password}
           onChange={handleForm}
           disabled={!formEnabled}
           required
@@ -97,7 +116,7 @@ export default function SignUpPage() {
           type='password'
           placeholder='Confirme a senha'
           name='confirmPassword'
-          value={user.confirmPassword}
+          value={form.confirmPassword}
           onChange={handleForm}
           disabled={!formEnabled}
           required

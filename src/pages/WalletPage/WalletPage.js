@@ -1,63 +1,37 @@
 import { useState, useContext, useEffect } from 'react';
-import styled from 'styled-components';
 import { IoLogOutOutline, IoAddCircleOutline, IoRemoveCircleOutline } from 'react-icons/io5';
 import { useNavigate, Link } from 'react-router-dom';
-import UserContext from '../UserContext';
-import WalletContext from '../WalletContext';
-import Records from './Records';
+import { ToastContainer, toast } from 'react-toastify';
+import styled from 'styled-components';
+import axios from 'axios';
+
+import { WALLET_URL, ENTRY_URL } from '../../constants.js';
+import UserContext from '../../UserContext.js';
+import WalletContext from '../../WalletContext.js';
+import Records from './Records.js';
+
 
 export default function WalletPage() {
 
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext);
   const { setEdit, setEntryType, setEntry } = useContext(WalletContext);
-  const [entriesList, setEntriesList] = useState([]);
+  const [wallet, setWallet] = useState([]);
+  const [refresh, setRefresh] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const navigate = useNavigate();
 
-  const data = [
-    {
-      id: 4,
-      type: 'out',
-      date: '30/11',
-      description: 'Almoço',
-      value: '39.90'
-    },
-    {
-      id: 3,
-      type: 'out',
-      date: '27/11',
-      description: 'Mercado',
-      value: '542.50'
-    },
-    {
-      id: 2,
-      type: 'out',
-      date: '26/11',
-      description: 'Compras',
-      value: '67.60'
-    },
-    {
-      id: 1,
-      type: 'in',
-      date: '30/11',
-      description: 'Empréstimo',
-      value: '500.02'
-    },
-    {
-      id: 0,
-      type: 'in',
-      date: '15/11',
-      description: 'Salário',
-      value: '3000.00'
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`
     }
-  ];
+  };
 
   useEffect(() => {
     setLoading(true)
-    /* axios.get(ENTRY_LIST_URL, config)
+    axios.get(WALLET_URL, config)
       .then(res => {
-        setEntriesList(res.data);
+        setWallet(res.data);
         setLoading(false);
       })
       .catch(err => {
@@ -67,8 +41,23 @@ export default function WalletPage() {
           position: toast.POSITION.TOP_CENTER,
           theme: 'colored',
         });
-      }); */
-  }, []);
+      });
+  }, [refresh]);
+
+  function handleDelete(id) {
+    if (window.confirm('Deseja realmente excluir esta entrada?')) {
+      axios.delete(`${ENTRY_URL}/${id}`, config)
+        .then(() => {
+          setRefresh(Math.random());
+        })
+        .catch(err => {
+          toast.error(`Erro: ${err.response.data.message}`, {
+            position: toast.POSITION.TOP_CENTER,
+            theme: 'colored',
+        });
+      });
+    }
+  }
 
   return (
     <PageContainer>
@@ -78,13 +67,22 @@ export default function WalletPage() {
         </Link>
         <div>
           <Name>{`Olá, ${user.name}`}</Name>
-          <button title='Logout'><IoLogOutOutline /></button>
+          <button 
+            title='Logout'
+            onClick={() => {
+              localStorage.removeItem('MyWallet');
+              navigate('/');
+            }}
+          >
+             <IoLogOutOutline />
+          </button>
         </div>
       </Top>
-      <Records 
-        entriesList={data}  
-        error={false}
-        loading={false}
+      <Records
+        wallet={wallet}
+        error={error}
+        loading={loading}
+        handleDelete={handleDelete}
       />
       <Footer>
         <Button
@@ -92,6 +90,7 @@ export default function WalletPage() {
           onClick={() => {
             setEntryType('in');
             setEdit(false);
+            setEntry({ value: '', description: '' })
             navigate('/entry');
           }}
         >
@@ -105,7 +104,7 @@ export default function WalletPage() {
           onClick={() => {
             setEntryType('out');
             setEdit(false);
-            setEntry({value: '', description: ''})
+            setEntry({ value: '', description: '' })
             navigate('/entry');
           }}
         >
@@ -123,7 +122,6 @@ const PageContainer = styled.main`
   width: 100%;
   min-width: 280px;
   height: 100vh;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -253,4 +251,3 @@ const Button = styled.button`
     cursor: pointer;
   }
 `;
-

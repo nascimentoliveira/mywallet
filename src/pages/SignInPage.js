@@ -4,12 +4,14 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
 import styled from 'styled-components';
 import axios from 'axios';
-import UserContext from '../UserContext';
+
+import UserContext from '../UserContext.js';
+import { SIGN_IN_URL } from '../constants.js';
 
 export default function SignUpPage() {
 
-  const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
   const [formEnabled, setFormEnabled] = useState(true);
   const [form, SetForm] = useState({ email: '', password: '' });
 
@@ -17,18 +19,14 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (user !== null) {
-      navigate('/wallet');
       setUser(user);
+      navigate('/wallet');
     }
   }, []);
 
   function handleForm(e) {
     const { name, value } = e.target
     SetForm({ ...form, [name]: value })
-  }
-
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   function spinner() {
@@ -42,11 +40,10 @@ export default function SignUpPage() {
     );
   }
 
-  async function signIn(e) {
-    setFormEnabled(false);
+  function signIn(e) {
     e.preventDefault();
-    await sleep(5 * 1000)
-    /* axios.post(SIGN_IN_URL, form)
+    setFormEnabled(false);
+    axios.post(SIGN_IN_URL, form)
       .then(res => {
         setUser(res.data);
         localStorage.setItem('MyWallet', JSON.stringify(res.data));
@@ -58,13 +55,11 @@ export default function SignUpPage() {
           theme: 'colored',
         });
         setFormEnabled(true);
-      }); */
-    setFormEnabled(true);
+      });
   }
 
   return (
     <PageContainer>
-      <ToastContainer />
       <Logo
         title={formEnabled ? 'Página inicial' : 'aguarde...'}
       >

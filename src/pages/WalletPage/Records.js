@@ -1,15 +1,18 @@
-import { useState, useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import { Rings } from 'react-loader-spinner';
 import { IoClose } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useNavigate, Link } from 'react-router-dom';
-import WalletContext from '../WalletContext'
 
-export default function Records({ entriesList, error, loading }) {
+import WalletContext from '../../WalletContext';
 
-  const { setEdit, setEntryType, setEntry } = useContext(WalletContext);
+
+export default function Records({ wallet, error, loading, handleDelete }) {
+  
   const navigate = useNavigate();
-  const noEntries = false;
+  const { setEdit, setEntry, setEntryType } = useContext(WalletContext);
+  
+  let noEntries = false;
 
   function calculateBalance(entries) {
     let balance = 0;
@@ -19,16 +22,12 @@ export default function Records({ entriesList, error, loading }) {
       else
         balance -= Number(entry.value);
     });
-    return balance.toFixed(2);
+    return balance;
   }
 
-  const balance = calculateBalance(entriesList)
+  const balance = calculateBalance(wallet);
 
-  function handleDelete(e, id) {
-    alert('tem certeza')
-  }
-
-  if (entriesList.length === 0) {
+  if (wallet.length === 0) {
     if (loading) {
       noEntries = true;
       return (
@@ -61,15 +60,15 @@ export default function Records({ entriesList, error, loading }) {
 
   return (
     <RecordsComponent noEntries={noEntries}>
-      <div>
-        {entriesList.map(entry =>
+      <Entries>
+        {wallet.map(entry =>
           <EntryComponent key={entry.id}>
             <Entry
               title={`Editar ${entry.type === 'in' ? 'entrada' : 'saída'}`}
               onClick={() => {
-                setEntryType(entry.type);
                 setEdit(true);
                 setEntry(entry);
+                setEntryType(entry.type);
                 navigate('/entry');
               }}
             >
@@ -81,18 +80,17 @@ export default function Records({ entriesList, error, loading }) {
             </Entry>
             <DeleteButton
               title={`Excluir ${entry.type === 'in' ? 'entrada' : 'saída'}`}
-              onClick={(e) => handleDelete(e, entry.id)}
+              onClick={() => handleDelete(entry.id)}
             >
               <IoClose />
             </DeleteButton>
           </EntryComponent>
-
         )}
-      </div>
+      </Entries>
       <div>
         <Balance>
           <span>SALDO</span>
-          <Total positive={(balance > 0) ? true : false}>{balance.toString().replace('.', ',')}</Total>
+          <Total positive={(balance > 0) ? true : false}>{Math.abs(balance).toFixed(2).toString().replace('.', ',')}</Total>
         </Balance>
       </div>
     </RecordsComponent>
@@ -100,8 +98,10 @@ export default function Records({ entriesList, error, loading }) {
 }
 
 const RecordsComponent = styled.section`
-  height: 100%;
   width: 100%;
+  height: -moz-calc(100% - 150px);
+  height: -webkit-calc(100% - 150px);
+  height: calc(100% - 150px);
   max-width: 330px;
   display: flex;
   flex-direction: column;
@@ -125,6 +125,14 @@ const RecordsComponent = styled.section`
     display: ${props => props.noEntries ? 'flex' : 'block'};
     justify-content: center;
   }
+`;
+
+const Entries = styled.section`
+  width: 100%;
+  display: ${props => props.noEntries ? 'flex' : 'block'};
+  justify-content: center;
+  overflow-y: auto;
+  margin-bottom: 15px;
 `;
 
 const EntryComponent = styled.section`
@@ -199,7 +207,7 @@ const Value = styled.span`
   font-size: 16px;
   line-height: 19px;
   text-align: right;
-  color: ${props => props.type == 'in' ? '#03AC00' : '#C70000'};
+  color: ${props => props.type === 'in' ? '#03AC00' : '#C70000'};
 `;
 
 const Balance = styled.section`
@@ -207,6 +215,7 @@ const Balance = styled.section`
   justify-content: space-between;
   align-items: center;
   padding: 0px 3px;
+  box-sizing: border-box;
 
   span {
     font-weight: 700;

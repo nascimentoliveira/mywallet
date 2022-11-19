@@ -1,12 +1,13 @@
 import GlobalStyle from './assets/styles/GlobalStyle';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useState } from 'react';
-import UserContext from './UserContext';
-import WalletContext from './WalletContext';
-import SignInPage from './pages/SignInPage';
-import SignUpPage from './pages/SignUpPage';
-import WalletPage from './pages/WalletPage';
-import EntryPage from './pages/EntryPage';
+
+import UserContext from './UserContext.js';
+import WalletContext from './WalletContext.js';
+import SignInPage from './pages/SignInPage.js';
+import SignUpPage from './pages/SignUpPage.js';
+import WalletPage from './pages/WalletPage/WalletPage.js';
+import EntryPage from './pages/EntryPage.js';
 
 export default function App() {
 
