@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
@@ -15,6 +15,10 @@ export default function EntryPage() {
   const { user } = useContext(UserContext);
   const { edit, entryType, entry, setEntry } = useContext(WalletContext);
   const [formEnabled, setFormEnabled] = useState(true);
+
+  useEffect(() => {
+    if (!user) navigate('/');
+  }, []);
 
   const config = {
     headers: {
@@ -43,7 +47,7 @@ export default function EntryPage() {
   function handleSend(e) {
     e.preventDefault();
     setFormEnabled(false);
-    /* setEntry({ ...entry, value: Number(entry.value).toFixed(2).toString() }); */
+
     if (edit) {
       axios.put(
         `${ENTRY_URL}/${entry.id}`, {
@@ -55,12 +59,14 @@ export default function EntryPage() {
           navigate('/wallet');
         })
         .catch(err => {
-          toast.error(`Erro: ${err.response.data.message}`, {
-            position: toast.POSITION.TOP_CENTER,
-            theme: 'colored',
-          });
+          if (err.response.status === 401) {
+            localStorage.removeItem('MyWallet');
+            navigate('/');
+          }
+          toast.error(err.response.data.message);
           setFormEnabled(true);
         });
+
     } else {
       axios.post(
         ENTRY_URL, {
@@ -72,10 +78,11 @@ export default function EntryPage() {
           navigate('/wallet');
         })
         .catch(err => {
-          toast.error(`Erro: ${err.response.data.message}`, {
-            position: toast.POSITION.TOP_CENTER,
-            theme: 'colored',
-          });
+          if (err.response.status === 401) {
+            localStorage.removeItem('MyWallet');
+            navigate('/');
+          }
+          toast.error(err.response.data.message);
           setFormEnabled(true);
         });
     }
@@ -83,6 +90,7 @@ export default function EntryPage() {
 
   return (
     <PageContainer>
+      <ToastContainer position='top-center' autoClose={2000} theme='colored' />
       <Link to='/'>
         <Logo
           title={formEnabled ? 'Página inicial' : 'aguarde...'}

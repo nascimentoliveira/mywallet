@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
+import { ToastContainer, toast } from 'react-toastify';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -36,16 +36,17 @@ export default function SignUpPage() {
 
   function confirmPassword() {
     if (form.password !== form.confirmPassword) {
-      toast.error(`Confirmação de senha não confere!`, {
-        position: toast.POSITION.TOP_CENTER,
-        theme: 'colored',
+      toast.error('Password confirmation does not match!');
+      SetForm({
+        ...form,
+        password: '',
+        confirmPassword: ''
       });
-      SetForm({ ...form, ['confirmPassword']: '' });
       setFormEnabled(true);
     } else {
       return ({
-        name: form.name, 
-        email: form.email, 
+        name: form.name,
+        email: form.email,
         password: form.password
       });
     }
@@ -62,10 +63,7 @@ export default function SignUpPage() {
           navigate('/');
         })
         .catch(err => {
-          toast.error(`Erro: ${err.response.data.message}`, {
-            position: toast.POSITION.TOP_CENTER,
-            theme: 'colored',
-          });
+          toast.error(err.response.data.message);
           setFormEnabled(true);
         });
     }
@@ -73,6 +71,7 @@ export default function SignUpPage() {
 
   return (
     <PageContainer>
+      <ToastContainer position='top-center' autoClose={2000} theme='colored' />
       <Link to='/'>
         <Logo
           title={formEnabled ? 'Página inicial' : 'aguarde...'}

@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
 import { Rings } from 'react-loader-spinner';
+import { ToastContainer, toast } from 'react-toastify';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -21,6 +21,8 @@ export default function SignUpPage() {
     if (user !== null) {
       setUser(user);
       navigate('/wallet');
+    } else {
+      toast.info('Faça login para entrar na aplicação!');
     }
   }, []);
 
@@ -50,9 +52,14 @@ export default function SignUpPage() {
         navigate('/wallet');
       })
       .catch(err => {
-        toast.error(`Erro: ${err.response.data.message}`, {
-          position: toast.POSITION.TOP_CENTER,
-          theme: 'colored',
+        if (err.response.status === 401) {
+          localStorage.removeItem('MyWallet');
+          navigate('/');
+        }
+        toast.error(err.response.data.message);
+        SetForm({
+          ...form,
+          password: ''
         });
         setFormEnabled(true);
       });
@@ -60,6 +67,7 @@ export default function SignUpPage() {
 
   return (
     <PageContainer>
+      <ToastContainer position='top-center' autoClose={2000} theme='colored' />
       <Logo
         title={formEnabled ? 'Página inicial' : 'aguarde...'}
       >

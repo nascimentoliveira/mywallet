@@ -4,14 +4,13 @@ import { IoClose } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import WalletContext from '../../WalletContext';
+import WalletContext from '../WalletContext.js';
 
+export default function Records({ wallet, error, loading, setRefresh, handleDelete }) {
 
-export default function Records({ wallet, error, loading, handleDelete }) {
-  
   const navigate = useNavigate();
   const { setEdit, setEntry, setEntryType } = useContext(WalletContext);
-  
+
   let noEntries = false;
 
   function calculateBalance(entries) {
@@ -28,8 +27,8 @@ export default function Records({ wallet, error, loading, handleDelete }) {
   const balance = calculateBalance(wallet);
 
   if (wallet.length === 0) {
+    noEntries = true;
     if (loading) {
-      noEntries = true;
       return (
         <RecordsComponent noEntries={noEntries}>
           Um momento...
@@ -75,12 +74,22 @@ export default function Records({ wallet, error, loading, handleDelete }) {
               <Date>{entry.date}</Date>
               <div>
                 <Description>{entry.description}</Description>
-                <Value type={entry.type}>{entry.value.toString().replace('.', ',')}</Value>
+                <Value type={entry.type}>{
+                  Number(entry.value)
+                    .toLocaleString(
+                      'pt-BR',
+                      { style: 'currency', currency: 'BRL' },
+                      { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+                    )}
+                </Value>
               </div>
             </Entry>
             <DeleteButton
               title={`Excluir ${entry.type === 'in' ? 'entrada' : 'saída'}`}
-              onClick={() => handleDelete(entry.id)}
+              onClick={() => {
+                handleDelete(entry.id, entry.description);
+                setRefresh(Math.random());
+              }}
             >
               <IoClose />
             </DeleteButton>
@@ -90,7 +99,13 @@ export default function Records({ wallet, error, loading, handleDelete }) {
       <div>
         <Balance>
           <span>SALDO</span>
-          <Total positive={(balance > 0) ? true : false}>{Math.abs(balance).toFixed(2).toString().replace('.', ',')}</Total>
+          <Total positive={(balance > 0) ? true : false}>{
+            Math.abs(balance).toLocaleString(
+              'pt-BR',
+              { style: 'currency', currency: 'BRL' },
+              { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+            )}
+          </Total>
         </Balance>
       </div>
     </RecordsComponent>
@@ -143,7 +158,7 @@ const EntryComponent = styled.section`
 
 const Entry = styled.button`
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -160,6 +175,8 @@ const Entry = styled.button`
   cursor: pointer;
 
   div {
+    height: auto;
+    min-height: 25px;
     width: 100%;
     display: flex;
     padding: 0px 3px 0px 7px;
@@ -196,10 +213,13 @@ const Date = styled.span`
 `;
 
 const Description = styled.span`
+  height: auto;
+  padding: 0px 4px;
   font-weight: 400;
   font-size: 16px;
   line-height: 19px;
   color: #000000;
+  word-break: break-word;
 `;
 
 const Value = styled.span`

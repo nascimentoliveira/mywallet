@@ -5,11 +5,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import styled from 'styled-components';
 import axios from 'axios';
 
-import { WALLET_URL, ENTRY_URL } from '../../constants.js';
-import UserContext from '../../UserContext.js';
-import WalletContext from '../../WalletContext.js';
-import Records from './Records.js';
-
+import { WALLET_URL, ENTRY_URL } from '../constants.js';
+import UserContext from '../UserContext.js';
+import WalletContext from '../WalletContext.js';
+import Records from '../components/Records.js';
 
 export default function WalletPage() {
 
@@ -28,53 +27,65 @@ export default function WalletPage() {
   };
 
   useEffect(() => {
-    setLoading(true)
-    axios.get(WALLET_URL, config)
-      .then(res => {
-        setWallet(res.data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setLoading(false);
-        setError(true);
-        toast.error(`Erro: ${err.response.data.message}`, {
-          position: toast.POSITION.TOP_CENTER,
-          theme: 'colored',
+    if (!user) {
+      navigate('/');
+    } else {
+      setLoading(true);
+      axios.get(WALLET_URL, config)
+        .then(res => {
+          setWallet(res.data);
+          setLoading(false);
+        })
+        .catch(err => {
+          if (err.response.status === 401) {
+            localStorage.removeItem('MyWallet');
+            navigate('/');
+          }
+          setLoading(false);
+          setError(true);
+          toast.error(err.response.data.message);
         });
-      });
+    }
   }, [refresh]);
 
-  function handleDelete(id) {
-    if (window.confirm('Deseja realmente excluir esta entrada?')) {
-      axios.delete(`${ENTRY_URL}/${id}`, config)
+  function handleDelete(id, description) {
+    if (window.confirm(`Deseja realmente excluir '${description}'?`)) {
+      toast.promise(axios.delete(`${ENTRY_URL}/${id}`, config)
         .then(() => {
           setRefresh(Math.random());
         })
         .catch(err => {
-          toast.error(`Erro: ${err.response.data.message}`, {
-            position: toast.POSITION.TOP_CENTER,
-            theme: 'colored',
+          if (err.response.status === 401) {
+            localStorage.removeItem('MyWallet');
+            navigate('/');
+          }
+          toast.error(err.response.data.message)
+        }),
+        {
+          pending: 'Excluindo...',
+          success: `'${description}' excluido!`,
+          error: `Erro ao excluir '${description}'`
         });
-      });
     }
   }
 
   return (
     <PageContainer>
+      <ToastContainer position='top-center' autoClose={2000} theme='colored' />
       <Top>
         <Link to='/'>
           <Logo title='Página inicial'>MyWallet</Logo>
         </Link>
         <div>
           <Name>{`Olá, ${user.name}`}</Name>
-          <button 
+          <button
             title='Logout'
             onClick={() => {
               localStorage.removeItem('MyWallet');
               navigate('/');
             }}
           >
-             <IoLogOutOutline />
+            <IoLogOutOutline />
           </button>
         </div>
       </Top>
@@ -82,6 +93,7 @@ export default function WalletPage() {
         wallet={wallet}
         error={error}
         loading={loading}
+        setRefresh={setRefresh}
         handleDelete={handleDelete}
       />
       <Footer>
@@ -205,6 +217,7 @@ const Name = styled.span`
   line-height: 25px;
   margin: 0px 5px;
   color: #FFFFFF;
+  word-break: break-word;
 `;
 
 const Footer = styled.footer`
