@@ -71,7 +71,7 @@ export default function Records({ wallet, error, loading, setRefresh, handleDele
                 navigate('/entry');
               }}
             >
-              <Date>{entry.date}</Date>
+              <DateEntry>{entry.date}</DateEntry>
               <div>
                 <Description>{entry.description}</Description>
                 <Value type={entry.type}>{
@@ -205,7 +205,7 @@ const DeleteButton = styled.button`
     }
 `;
 
-const Date = styled.span`
+const DateEntry = styled.span`
   font-weight: 400;
   font-size: 16px;
   line-height: 19px;
